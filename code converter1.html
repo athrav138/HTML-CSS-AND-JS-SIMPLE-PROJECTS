@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Language Converter</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .converter-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            padding: 30px;
+        }
+
+        .code-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .panel-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .panel-header label {
+            font-weight: 600;
+            font-size: 1.1em;
+            color: #333;
+        }
+
+        select {
+            padding: 10px 15px;
+            font-size: 1em;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        select:hover {
+            border-color: #764ba2;
+        }
+
+        textarea {
+            width: 100%;
+            height: 400px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            resize: vertical;
+            background: #f8f9fa;
+            transition: all 0.3s;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+        }
+
+        .button-container {
+            grid-column: span 2;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        button {
+            padding: 15px 40px;
+            font-size: 1.1em;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .convert-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .convert-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .clear-btn {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .clear-btn:hover {
+            background: #ee5a52;
+            transform: translateY(-2px);
+        }
+
+        .swap-btn {
+            background: #51cf66;
+            color: white;
+        }
+
+        .swap-btn:hover {
+            background: #40c057;
+            transform: translateY(-2px);
+        }
+
+        .note {
+            grid-column: span 2;
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            color: #856404;
+        }
+
+        @media (max-width: 768px) {
+            .converter-container {
+                grid-template-columns: 1fr;
+            }
+
+            .button-container {
+                grid-column: span 1;
+                flex-direction: column;
+            }
+
+            .note {
+                grid-column: span 1;
+            }
+
+            textarea {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔄 Code Language Converter</h1>
+            <p>Convert code between Python, Java, C, C++, and JavaScript</p>
+        </div>
+
+        <div class="converter-container">
+            <div class="code-panel">
+                <div class="panel-header">
+                    <label>From:</label>
+                    <select id="fromLang">
+                        <option value="python">Python</option>
+                        <option value="java">Java</option>
+                        <option value="c">C</option>
+                        <option value="cpp">C++</option>
+                        <option value="javascript">JavaScript</option>
+                    </select>
+                </div>
+                <textarea id="inputCode" placeholder="Paste your code here..."></textarea>
+            </div>
+
+            <div class="code-panel">
+                <div class="panel-header">
+                    <label>To:</label>
+                    <select id="toLang">
+                        <option value="python">Python</option>
+                        <option value="java" selected>Java</option>
+                        <option value="c">C</option>
+                        <option value="cpp">C++</option>
+                        <option value="javascript">JavaScript</option>
+                    </select>
+                </div>
+                <textarea id="outputCode" placeholder="Converted code will appear here..." readonly></textarea>
+            </div>
+
+            <div class="button-container">
+                <button class="convert-btn" onclick="convertCode()">Convert Code</button>
+                <button class="swap-btn" onclick="swapLanguages()">⇄ Swap</button>
+                <button class="clear-btn" onclick="clearAll()">Clear All</button>
+            </div>
+
+            <div class="note">
+                <strong>Note:</strong> This is a basic pattern-based converter. For complex code, manual adjustments may be needed.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function convertCode() {
+            const inputCode = document.getElementById('inputCode').value.trim();
+            const fromLang = document.getElementById('fromLang').value;
+            const toLang = document.getElementById('toLang').value;
+            const outputCode = document.getElementById('outputCode');
+
+            if (!inputCode) {
+                outputCode.value = 'Please enter some code to convert.';
+                return;
+            }
+
+            if (fromLang === toLang) {
+                outputCode.value = 'Source and target languages are the same!\nPlease select different languages.';
+                return;
+            }
+
+            let converted = inputCode;
+
+            // Convert from source to intermediate representation
+            converted = normalizeCode(converted, fromLang);
+
+            // Convert to target language
+            converted = generateCode(converted, toLang, fromLang);
+
+            outputCode.value = converted;
+        }
+
+        function normalizeCode(code, fromLang) {
+            // Remove language-specific comments
+            if (fromLang === 'python') {
+                code = code.replace(/#.*$/gm, '');
+            } else {
+                code = code.replace(/\/\/.*$/gm, '');
+                code = code.replace(/\/\*[\s\S]*?\*\//g, '');
+            }
+            return code;
+        }
+
+        function generateCode(code, toLang, fromLang) {
+            let result = code;
+
+            // Print/Output statements
+            result = convertPrintStatements(result, fromLang, toLang);
+
+            // Variable declarations
+            result = convertVariableDeclarations(result, fromLang, toLang);
+
+            // Function definitions
+            result = convertFunctionDefinitions(result, fromLang, toLang);
+
+            // Conditionals
+            result = convertConditionals(result, fromLang, toLang);
+
+            // Loops
+            result = convertLoops(result, fromLang, toLang);
+
+            // Add language-specific boilerplate
+            result = addBoilerplate(result, toLang);
+
+            return result;
+        }
+
+        function convertPrintStatements(code, from, to) {
+            let result = code;
+
+            // Detect print patterns from source
+            const printPatterns = {
+                python: /print\((.*?)\)/g,
+                java: /System\.out\.println\((.*?)\);/g,
+                c: /printf\((.*?)\);/g,
+                cpp: /cout\s*<<\s*(.*?)\s*<<\s*endl;/g,
+                javascript: /console\.log\((.*?)\);/g
+            };
+
+            // Replace with target language print
+            const printReplacements = {
+                python: (match, content) => `print(${content})`,
+                java: (match, content) => `System.out.println(${content});`,
+                c: (match, content) => `printf("%s\\n", ${content});`,
+                cpp: (match, content) => `cout << ${content} << endl;`,
+                javascript: (match, content) => `console.log(${content});`
+            };
+
+            if (printPatterns[from]) {
+                result = result.replace(printPatterns[from], printReplacements[to]);
+            }
+
+            return result;
+        }
+
+        function convertVariableDeclarations(code, from, to) {
+            let result = code;
+
+            // Python variable assignment to other languages
+            if (from === 'python') {
+                result = result.replace(/(\w+)\s*=\s*([^=\n]+)/g, (match, varName, value) => {
+                    if (to === 'java' || to === 'c' || to === 'cpp') {
+                        return `int ${varName} = ${value};`;
+                    } else if (to === 'javascript') {
+                        return `let ${varName} = ${value};`;
+                    }
+                    return match;
+                });
+            }
+
+            return result;
+        }
+
+        function convertFunctionDefinitions(code, from, to) {
+            let result = code;
+
+            // Python def to other languages
+            if (from === 'python' && /def\s+\w+\s*\(/.test(code)) {
+                result = result.replace(/def\s+(\w+)\s*\((.*?)\)\s*:/g, (match, funcName, params) => {
+                    if (to === 'java') {
+                        return `public static void ${funcName}(${params}) {`;
+                    } else if (to === 'c' || to === 'cpp') {
+                        return `void ${funcName}(${params}) {`;
+                    } else if (to === 'javascript') {
+                        return `function ${funcName}(${params}) {`;
+                    }
+                    return match;
+                });
+            }
+
+            return result;
+        }
+
+        function convertConditionals(code, from, to) {
+            let result = code;
+
+            // Python if/elif/else to other languages
+            if (from === 'python') {
+                result = result.replace(/if\s+(.*?):/g, 'if ($1) {');
+                result = result.replace(/elif\s+(.*?):/g, '} else if ($1) {');
+                result = result.replace(/else:/g, '} else {');
+            }
+
+            // Other languages to Python
+            if (to === 'python') {
+                result = result.replace(/if\s*\((.*?)\)\s*\{/g, 'if $1:');
+                result = result.replace(/\}\s*else\s+if\s*\((.*?)\)\s*\{/g, 'elif $1:');
+                result = result.replace(/\}\s*else\s*\{/g, 'else:');
+                result = result.replace(/\}/g, '');
+            }
+
+            return result;
+        }
+
+        function convertLoops(code, from, to) {
+            let result = code;
+
+            // Python for loop
+            if (from === 'python') {
+                result = result.replace(/for\s+(\w+)\s+in\s+range\((.*?)\):/g, (match, varName, range) => {
+                    if (to === 'java' || to === 'c' || to === 'cpp' || to === 'javascript') {
+                        return `for (int ${varName} = 0; ${varName} < ${range}; ${varName}++) {`;
+                    }
+                    return match;
+                });
+            }
+
+            return result;
+        }
+
+        function addBoilerplate(code, toLang) {
+            const lines = code.split('\n').filter(line => line.trim());
+            
+            if (toLang === 'java') {
+                return `public class Main {\n    public static void main(String[] args) {\n        ${lines.map(l => '    ' + l).join('\n')}\n    }\n}`;
+            } else if (toLang === 'c') {
+                return `#include <stdio.h>\n\nint main() {\n    ${lines.map(l => '    ' + l).join('\n')}\n    return 0;\n}`;
+            } else if (toLang === 'cpp') {
+                return `#include <iostream>\nusing namespace std;\n\nint main() {\n    ${lines.map(l => '    ' + l).join('\n')}\n    return 0;\n}`;
+            }
+
+            return code;
+        }
+
+        function swapLanguages() {
+            const fromLang = document.getElementById('fromLang');
+            const toLang = document.getElementById('toLang');
+            const inputCode = document.getElementById('inputCode');
+            const outputCode = document.getElementById('outputCode');
+
+            // Swap language selections
+            const temp = fromLang.value;
+            fromLang.value = toLang.value;
+            toLang.value = temp;
+
+            // Swap code
+            const tempCode = inputCode.value;
+            inputCode.value = outputCode.value;
+            outputCode.value = tempCode;
+        }
+
+        function clearAll() {
+            document.getElementById('inputCode').value = '';
+            document.getElementById('outputCode').value = '';
+        }
+    </script>
+</body>
+</html>

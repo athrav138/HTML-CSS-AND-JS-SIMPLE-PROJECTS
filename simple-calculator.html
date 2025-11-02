@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .calculator {
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            width: 340px;
+        }
+
+        .display {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: right;
+            font-size: 2.5em; /* Set a large, fixed font size */
+            min-height: 65px;
+            word-wrap: break-word; /* Wrap text if it gets too long */
+            word-break: break-all; /* Break long numbers */
+            border: 2px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            overflow: hidden;
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        button {
+            padding: 20px;
+            font-size: 1.3em;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            background: #f0f0f0;
+            transition: all 0.2s;
+            font-weight: 600;
+            color: #333;
+        }
+
+        button:hover {
+            background: #e0e0e0;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        button:active {
+            transform: translateY(0);
+            box-shadow: none;
+        }
+        
+        /* Utility button style (for 'delete') */
+        .utility {
+            background: #ff8c00; 
+            color: white;
+        }
+        .utility:hover {
+            background: #e67e00;
+        }
+
+        .operator {
+            background: #667eea;
+            color: white;
+        }
+
+        .operator:hover {
+            background: #5568d3;
+        }
+
+        .equals {
+            background: #764ba2;
+            color: white;
+            grid-column: span 2; /* Make equals span 2 columns */
+        }
+
+        .equals:hover {
+            background: #653a8a;
+        }
+
+        .clear {
+            background: #ff6b6b;
+            color: white;
+            grid-column: span 2; /* Make clear span 2 columns */
+        }
+
+        .clear:hover {
+            background: #ee5a52;
+        }
+
+        .zero {
+            grid-column: span 2;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <div class="display" id="display">0</div>
+        
+        <!-- 
+          We are back to using onclick="" for simplicity,
+          but with the improved button layout and styling!
+        -->
+        <div class="buttons">
+            <button class="clear" onclick="clearDisplay()">C</button>
+            <button class="utility" onclick="deleteLast()">←</button>
+            <button class="operator" onclick="appendToDisplay('/')">/</button>
+
+            <button onclick="appendToDisplay('7')">7</button>
+            <button onclick="appendToDisplay('8')">8</button>
+            <button onclick="appendToDisplay('9')">9</button>
+            <button class="operator" onclick="appendToDisplay('*')">*</button>
+            
+            <button onclick="appendToDisplay('4')">4</button>
+            <button onclick="appendToDisplay('5')">5</button>
+            <button onclick="appendToDisplay('6')">6</button>
+            <button class="operator" onclick="appendToDisplay('-')">-</button>
+            
+            <button onclick="appendToDisplay('1')">1</button>
+            <button onclick="appendToDisplay('2')">2</button>
+            <button onclick="appendToDisplay('3')">3</button>
+            <button class="operator" onclick="appendToDisplay('+')">+</button>
+            
+            <button class="zero" onclick="appendToDisplay('0')">0</button>
+            <button onclick="appendToDisplay('.')">.</button>
+            <button class="equals" onclick="calculate()">=</button>
+        </div>
+    </div>
+
+    <script>
+        // Get the display element once
+        let display = document.getElementById('display');
+        
+        // This is our only "state" variable, just like your original
+        let currentValue = '0';
+
+        // Appends the clicked value to our string
+        function appendToDisplay(value) {
+            // If current value is '0', replace it (unless adding a decimal)
+            if (currentValue === '0' && value !== '.') {
+                currentValue = value;
+            } else {
+                // Otherwise, just add to the string
+                currentValue += value;
+            }
+            updateDisplay();
+        }
+
+        // Resets the calculator
+        function clearDisplay() {
+            currentValue = '0';
+            updateDisplay();
+        }
+
+        // Deletes the last character
+        function deleteLast() {
+            currentValue = currentValue.slice(0, -1);
+            // If we delete everything, reset to '0'
+            if (currentValue === '') {
+                currentValue = '0';
+            }
+            updateDisplay();
+        }
+
+        // The simple (but powerful) calculate function
+        function calculate() {
+            try {
+                // eval() attempts to run the string as code.
+                // '5+5' becomes 10
+                // '10*2' becomes 20
+                currentValue = eval(currentValue).toString();
+            } catch (error) {
+                // If eval() fails (e.g., '5++5' or '5.'), show an error
+                currentValue = 'Error';
+                updateDisplay(); // Show 'Error'
+                
+                // Reset after 1.5 seconds
+                setTimeout(() => {
+                    clearDisplay();
+                }, 1500);
+            }
+            updateDisplay(); // Show the result
+        }
+
+        // Single function to update the HTML display
+        function updateDisplay() {
+            display.textContent = currentValue;
+        }
+    </script>
+</body>
+</html>

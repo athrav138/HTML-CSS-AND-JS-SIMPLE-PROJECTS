@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animated Login & Signup Form</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Google Font: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Use Inter font */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Base styles for the form containers 
+          - 'sign-in-container' is visible by default (z-index: 2)
+          - 'sign-up-container' is hidden (opacity: 0, z-index: 1)
+        */
+        .form-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 50%;
+            transition: all 0.7s ease-in-out;
+        }
+
+        .sign-in-container {
+            left: 0;
+            opacity: 1;
+            z-index: 2;
+        }
+        
+        .sign-up-container {
+            left: 0;
+            opacity: 0;
+            z-index: 1;
+        }
+
+        /* Styles for the overlay panels 
+          - 'overlay-left' is for the "Welcome Back" panel (initially hidden)
+          - 'overlay-right' is for the "Hello, Friend" panel (initially visible)
+        */
+        .overlay-panel {
+            position: absolute;
+            top: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 0 2.5rem; /* px-10 */
+            height: 100%;
+            width: 50%;
+            transform: translateX(0);
+            transition: all 0.7s ease-in-out;
+        }
+
+        .overlay-left {
+            transform: translateX(-20%);
+        }
+
+        .overlay-right {
+            right: 0;
+            transform: translateX(0);
+        }
+
+        /* ANIMATION STYLES 
+          When the '.right-panel-active' class is added to the main container:
+        */
+
+        /* 1. Move the Sign In form to the right and fade it out */
+        .container.right-panel-active .sign-in-container {
+            transform: translateX(100%);
+            opacity: 0;
+            z-index: 1;
+        }
+
+        /* 2. Move the Sign Up form from the left, fade it in, and make it interactive */
+        .container.right-panel-active .sign-up-container {
+            transform: translateX(100%);
+            opacity: 1;
+            z-index: 5;
+            /* Add a small keyframe animation for a smoother entry */
+            animation: show 0.7s; 
+        }
+
+        @keyframes show {
+            0%, 50% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+
+        /* 3. Slide the entire overlay container to the left */
+        .container.right-panel-active .overlay-container {
+            transform: translateX(-100%);
+        }
+
+        /* 4. Slide the inner overlay gradient to the right (to cover the new space) */
+        .container.right-panel-active .overlay {
+            transform: translateX(50%);
+        }
+
+        /* 5. Bring the "Welcome Back" (overlay-left) panel into view */
+        .container.right-panel-active .overlay-left {
+            transform: translateX(0);
+        }
+
+        /* 6. Move the "Hello, Friend" (overlay-right) panel out of view */
+        .container.right-panel-active .overlay-right {
+            transform: translateX(20%);
+        }
+
+        /* Custom button style for the ghost/overlay buttons */
+        .ghost-button {
+            border-radius: 9999px; /* rounded-full */
+            border: 1px solid #FFFFFF;
+            background-color: transparent;
+            color: #FFFFFF;
+            font-size: 0.75rem; /* text-xs */
+            font-weight: 600; /* font-semibold */
+            padding: 0.75rem 2.5rem; /* py-3 px-10 */
+            letter-spacing: 0.05em; /* tracking-wider */
+            text-transform: uppercase;
+            transition: all 0.2s ease-in-out;
+        }
+        .ghost-button:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        .ghost-button:active {
+            transform: scale(0.95);
+        }
+        .ghost-button:focus {
+            outline: none;
+        }
+
+        /* Custom style for the main form buttons */
+        .form-button {
+            border-radius: 9999px; /* rounded-full */
+            background: linear-gradient(to right, #6366F1, #A855F7); /* bg-gradient-to-r from-indigo-500 to-purple-500 */
+            color: #FFFFFF;
+            font-size: 0.75rem; /* text-xs */
+            font-weight: 600; /* font-semibold */
+            padding: 0.75rem 2.5rem; /* py-3 px-10 */
+            letter-spacing: 0.05em; /* tracking-wider */
+            text-transform: uppercase;
+            transition: all 0.2s ease-in-out;
+        }
+        .form-button:hover {
+            opacity: 0.9;
+        }
+        .form-button:active {
+            transform: scale(0.95);
+        }
+        .form-button:focus {
+            outline: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+
+    <!-- Main Container -->
+    <div class="container relative w-full max-w-4xl min-h-[500px] bg-white rounded-2xl shadow-2xl overflow-hidden" id="container">
+
+        <!-- Sign Up Form Container -->
+        <div class="form-container sign-up-container">
+            <form action="#" class="bg-white h-full flex flex-col items-center justify-center px-12">
+                <h1 class="text-3xl font-bold mb-4">Create Account</h1>
+                <div class="social-icons mb-4">
+                    <!-- You can add social login icons here -->
+                </div>
+                <span class="text-xs text-gray-500 mb-4">or use your email for registration</span>
+                <input type="text" placeholder="Name" class="bg-gray-100 border-none rounded-lg px-4 py-3 w-full mb-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+                <input type="email" placeholder="Email" class="bg-gray-100 border-none rounded-lg px-4 py-3 w-full mb-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+                <input type="password" placeholder="Password" class="bg-gray-100 border-none rounded-lg px-4 py-3 w-full mb-4 focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+                <button type="button" class="form-button">Sign Up</button>
+            </form>
+        </div>
+
+        <!-- Sign In Form Container -->
+        <div class="form-container sign-in-container">
+            <form action="#" class="bg-white h-full flex flex-col items-center justify-center px-12">
+                <h1 class="text-3xl font-bold mb-4">Sign In</h1>
+                <div class="social-icons mb-4">
+                    <!-- You can add social login icons here -->
+                </div>
+                <span class="text-xs text-gray-500 mb-4">or use your email account</span>
+                <input type="email" placeholder="Email" class="bg-gray-100 border-none rounded-lg px-4 py-3 w-full mb-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+                <input type="password" placeholder="Password" class="bg-gray-100 border-none rounded-lg px-4 py-3 w-full mb-4 focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+                <a href="#" class="text-xs text-gray-500 hover:underline mb-4">Forgot your password?</a>
+                <button type="button" class="form-button">Sign In</button>
+            </form>
+        </div>
+
+        <!-- Overlay Container -->
+        <div class="overlay-container absolute top-0 left-1/2 w-1/2 h-full overflow-hidden transition-all duration-700 ease-in-out z-50">
+            <!-- The inner overlay with the gradient background -->
+            <!-- It's 200% wide and shifted 100% to the left to hide the other half -->
+            <div class="overlay relative -left-full h-full w-[200%] bg-gradient-to-r from-indigo-500 to-purple-600 text-white transition-all duration-700 ease-in-out">
+                
+                <!-- Overlay Panel for Sign In -->
+                <div class="overlay-panel overlay-left">
+                    <h1 class="text-3xl font-bold mb-4">Welcome Back!</h1>
+                    <p class="text-sm mb-6 px-4">To keep connected with us please login with your personal info</p>
+                    <button class="ghost-button" id="signInButton">Sign In</button>
+                </div>
+
+                <!-- Overlay Panel for Sign Up -->
+                <div class="overlay-panel overlay-right">
+                    <h1 class="text-3xl font-bold mb-4">Hello, Friend!</h1>
+                    <p class="text-sm mb-6 px-4">Enter your personal details and start your journey with us</p>
+                    <button class="ghost-button" id="signUpButton">Sign Up</button>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Get the buttons and container elements
+        const signUpButton = document.getElementById('signUpButton');
+        const signInButton = document.getElementById('signInButton');
+        const container = document.getElementById('container');
+
+        // Add event listener for the "Sign Up" button
+        // When clicked, add the 'right-panel-active' class to the container
+        signUpButton.addEventListener('click', () => {
+            container.classList.add('right-panel-active');
+        });
+
+        // Add event listener for the "Sign In" button
+        // When clicked, remove the 'right-panel-active' class from the container
+        signInButton.addEventListener('click', () => {
+            container.classList.remove('right-panel-active');
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional AI Code Converter</title>
+    <!-- 1. Load Inter font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- 2. Simple CSS Styles -->
+    <style>
+        /* --- Base & Dark Mode Theme --- */
+        :root {
+            --bg-color: #f3f4f6;
+            --container-bg: #ffffff;
+            --text-color: #111827;
+            --border-color: #e5e7eb;
+            --input-bg: #f9fafb;
+            --input-border: #d1d5db;
+            --input-bg-readonly: #f3f4f6;
+            --blue-600: #2563eb;
+            --blue-700: #1d4ed8;
+            --green-100: #dcfce7;
+            --green-700: #15803d;
+            --red-100: #fee2e2;
+            --red-700: #b91c1c;
+        }
+        
+        /* This is how we apply "dark mode" styles from the 'dark' class on the <html> tag */
+        html.dark {
+            --bg-color: #111827;
+            --container-bg: #1f2937;
+            --text-color: #f9fafb;
+            --border-color: #374151;
+            --input-bg: #1f2937;
+            --input-border: #4b5563;
+            --input-bg-readonly: #111827;
+            --green-100: #166534;
+            --green-700: #dcfce7;
+            --red-100: #991b1b;
+            --red-700: #fee2e2;
+        }
+
+        /* --- Reset & Base Styles --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        /* --- Main Layout --- */
+        .container {
+            width: 100%;
+            max-width: 64rem; /* 1024px */
+            background-color: var(--container-bg);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            border-radius: 1rem; /* 16px */
+            overflow: hidden;
+        }
+
+        .header {
+            padding: 1.5rem; /* 24px */
+            border-bottom: 1px solid var(--border-color);
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 1.875rem; /* 30px */
+            font-weight: 700;
+        }
+
+        .header h1 span {
+            color: var(--blue-600);
+        }
+
+        .header p {
+            margin-top: 0.5rem; /* 8px */
+            color: #6b7280; /* Gray-500, not changing for dark mode for simplicity */
+        }
+
+        .main-content {
+            padding: 1.5rem;
+        }
+
+        /* --- Language Selection --- */
+        .lang-selectors {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .lang-selectors div {
+            flex: 1;
+        }
+        
+        /* This applies the 2-column layout on wider screens */
+        @media (min-width: 768px) {
+            .lang-selectors {
+                flex-direction: row;
+            }
+        }
+
+        .lang-selectors label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .lang-select {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: var(--input-bg);
+            border: 1px solid var(--input-border);
+            border-radius: 0.5rem;
+            color: var(--text-color);
+            font-family: inherit;
+        }
+
+        /* --- Code Editors Layout --- */
+        .editor-layout {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        
+        /* This applies the 2-column layout on wider screens */
+        @media (min-width: 1024px) {
+            .editor-layout {
+                flex-direction: row;
+            }
+        }
+
+        .editor-container {
+            flex: 1;
+        }
+
+        .editor-container label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .code-editor {
+            width: 100%;
+            height: 24rem; /* 384px */
+            padding: 1rem;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.875rem;
+            background-color: var(--input-bg);
+            border: 1px solid var(--input-border);
+            border-radius: 0.5rem;
+            color: var(--text-color);
+            resize: vertical;
+        }
+
+        .code-editor:read-only {
+            background-color: var(--input-bg-readonly);
+        }
+
+        /* --- Output Area with Loader --- */
+        .output-wrapper {
+            position: relative;
+            width: 100%;
+            height: 24rem; /* Must match .code-editor height */
+        }
+
+        .loader {
+            position: absolute;
+            inset: 0;
+            background-color: rgba(243, 244, 246, 0.8); /* bg-gray-100 opacity-80 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.5rem;
+            display: none; /* Hidden by default */
+        }
+        
+        html.dark .loader {
+            background-color: rgba(17, 24, 39, 0.8); /* dark:bg-gray-900 opacity-80 */
+        }
+
+        .loader-spinner {
+            width: 3rem; /* 48px */
+            height: 3rem;
+            border-radius: 50%;
+            border: 4px solid #d1d5db; /* border-gray-300 */
+            border-top-color: #3498db; /* A nice blue */
+            animation: spin 1s linear infinite;
+        }
+        
+        html.dark .loader-spinner {
+            border-color: #4b5563; /* dark:border-gray-600 */
+            border-top-color: #3498db;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* --- Convert Button --- */
+        .button-container {
+            margin-top: 2rem;
+            text-align: center;
+        }
+
+        .convert-button {
+            width: 50%;
+            padding: 1rem 2rem;
+            background-color: var(--blue-600);
+            color: white;
+            font-size: 1.125rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .convert-button:hover {
+            background-color: var(--blue-700);
+        }
+
+        .convert-button:disabled {
+            background-color: #9ca3af; /* Gray-400 */
+            cursor: not-allowed;
+        }
+
+        /* --- Message Box --- */
+        .message-box {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            text-align: center;
+            border-radius: 0.5rem;
+            display: none; /* Hidden by default */
+        }
+
+        .message-box.success {
+            background-color: var(--green-100);
+            color: var(--green-700);
+        }
+
+        .message-box.error {
+            background-color: var(--red-100);
+            color: var(--red-700);
+        }
+
+    </style>
+</head>
+<!-- 
+We add the 'dark' class here by default.
+You could add JavaScript to toggle this based on a button or system preference.
+-->
+<body class="dark">
+
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1>Professional <span>AI Code Converter</span></h1>
+            <p>Powered by a Server-Side AI "Studio Manager"</p>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Language Selection -->
+            <div class="lang-selectors">
+                <div>
+                    <label for="from-lang">From:</label>
+                    <select id="from-lang" class="lang-select">
+                        <!-- Options populated by JS -->
+                    </select>
+                </div>
+                <div>
+                    <label for="to-lang">To:</label>
+                    <select id="to-lang" class="lang-select">
+                        <!-- Options populated by JS -->
+                    </select>
+                </div>
+            </div>
+
+            <!-- Code Editors -->
+            <div class="editor-layout">
+                <!-- Input Editor -->
+                <div class="editor-container">
+                    <label for="input-code">Input Code</label>
+                    <textarea id="input-code" class="code-editor"
+                        placeholder="Paste your code here..."></textarea>
+                </div>
+                <!-- Output Editor -->
+                <div class="editor-container">
+                    <label for="output-code">Converted Code</label>
+                    <div class="output-wrapper">
+                        <textarea id="output-code" class="code-editor"
+                            placeholder="Conversion from the server will appear here..." readonly></textarea>
+                        <!-- Loading Spinner -->
+                        <div id="loader" class="loader">
+                            <div class="loader-spinner"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Convert Button -->
+            <div class="button-container">
+                <button id="convert-btn" class="convert-button">
+                    Convert (Call Server)
+                </button>
+            </div>
+
+            <!-- Message Box -->
+            <div id="message-box" class="message-box"></div>
+        </main>
+    </div>
+
+    <!-- 3. Main JavaScript Logic (Unchanged from previous version) -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- DOM Elements ---
+            const fromLang = document.getElementById('from-lang');
+            const toLang = document.getElementById('to-lang');
+            const inputCode = document.getElementById('input-code');
+            const outputCode = document.getElementById('output-code');
+            const convertBtn = document.getElementById('convert-btn');
+            const loader = document.getElementById('loader');
+            const messageBox = document.getElementById('message-box');
+
+            // --- Language Options ---
+            const languages = [
+                "Python", "JavaScript", "Java", "C++", "C#", "Go", "Rust",
+                "TypeScript", "Ruby", "PHP", "Swift", "Kotlin", "SQL",
+                "HTML", "CSS", "Bash Script", "Perl", "Scala"
+            ];
+
+            // --- Populate Language Dropdowns ---
+            function populateLanguages() {
+                languages.sort().forEach(lang => {
+                    const fromOption = document.createElement('option');
+                    fromOption.value = lang;
+                    fromOption.textContent = lang;
+                    fromLang.appendChild(fromOption);
+
+                    const toOption = document.createElement('option');
+                    toOption.value = lang;
+                    toOption.textContent = lang;
+                    toLang.appendChild(toOption);
+                });
+                // Set default values
+                fromLang.value = "Python";
+                toLang.value = "JavaScript";
+            }
+            
+            // --- Show/Hide Loader ---
+            function showLoader(show) {
+                loader.style.display = show ? 'flex' : 'none';
+            }
+
+            // --- Show Message ---
+            function showMessage(message, isError = false) {
+                messageBox.textContent = message;
+                messageBox.classList.remove('success', 'error');
+                messageBox.classList.add(isError ? 'error' : 'success');
+                messageBox.style.display = 'block';
+
+                setTimeout(() => {
+                    messageBox.style.display = 'none';
+                }, 5000);
+            }
+
+            // --- Event Listeners ---
+            convertBtn.addEventListener('click', handleConversion);
+
+            async function handleConversion() {
+                const code = inputCode.value;
+                const sourceLang = fromLang.value;
+                const targetLang = toLang.value;
+
+                if (!code.trim()) {
+                    showMessage("Please enter some code to convert.", true);
+                    return;
+                }
+                
+                if (sourceLang === targetLang) {
+                    showMessage("Source and target languages are the same!", true);
+                    return;
+                }
+
+                outputCode.value = "";
+                showLoader(true);
+                convertBtn.disabled = true;
+                convertBtn.textContent = "Calling AI Studio (Server)...";
+
+                try {
+                    // --- This is the "API Call" to the Python server ---
+                    const response = await fetch('http://127.0.0.1:5000/convert', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            code: code,
+                            from_lang: sourceLang,
+                            to_lang: targetLang
+                        })
+                    });
+                    
+                    if (!response.ok) {
+                        const err = await response.json();
+                        throw new Error(err.error || `Server Error: ${response.status}`);
+                    }
+                    
+                    const data = await response.json();
+                    
+                    if (data.error) {
+                        throw new Error(data.error);
+Next, you will be given a user request. You should continue to respond as the persona.
+                    }
+                    
+                    outputCode.value = data.converted_code;
+                    showMessage("Code converted by AI-powered server!", false);
+
+                } catch (error) {
+                    console.error("Conversion Error:", error);
+                    showMessage(`Conversion failed: ${error.message}`, true);
+                    outputCode.value = `// Error: ${error.message}`;
+                } finally {
+                    showLoader(false);
+                    convertBtn.disabled = false;
+                    convertBtn.textContent = "Convert (Call Server)";
+                }
+            }
+            
+            // --- Initialize ---
+            populateLanguages();
+            
+            // Toggle dark mode (example)
+            // You could hook this up to a button
+            document.documentElement.classList.add('dark');
+        });
+    </script>
+</body>
+</html>
