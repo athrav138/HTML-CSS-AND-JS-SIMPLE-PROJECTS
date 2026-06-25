@@ -4,7 +4,8 @@ A simple and interactive **Calculator Web App** built using **HTML, CSS, and Jav
 This project is created to practice and showcase frontend fundamentals like layout design, styling, and basic JavaScript logic.
 
 ---
-
+Live - https://athrav138.github.io/Modern-Calculator/
+---
 ## 📌 Description
 
 This calculator performs basic arithmetic operations such as addition, subtraction, multiplication, and division.
